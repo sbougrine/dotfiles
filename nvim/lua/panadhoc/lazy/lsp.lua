@@ -61,18 +61,18 @@ return {
                             pylsp = {
                                 plugins = {
                                     -- formatter options
-                                    black = { 
+                                    black = {
                                         enabled = true,
                                         line_length = 79
                                     },
                                     autopep8 = { enabled = false },
                                     yapf = { enabled = false },
-                                    
+
                                     -- linter options
                                     -- pylint = { enabled = false, executable = "pylint" },
                                     -- pyflakes = { enabled = true },
                                     -- pycodestyle = { enabled = false },
-                                    
+
                                     -- type checker
                                     pylsp_mypy = { enabled = true },
                                     -- auto-completion options
@@ -117,7 +117,7 @@ return {
             }
 
         })
-        local signs = { Error = "", Warn = "", Hint = "", Info = "" }
+        local signs = { Error = "", Warn = "", Hint = "", Info = "" }
         for type, icon in pairs(signs) do
             local hl = "DiagnosticSign" .. type
             vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })

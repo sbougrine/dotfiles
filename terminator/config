@@ -13,7 +13,7 @@
     palette = "#3B4252:#BF616A:#A3BE8C:#EBCB8B:#81A1C1:#B48EAD:#88C0D0:#E5E9F0:#4C566A:#BF616A:#A3BE8C:#EBCB8B:#81A1C1:#B48EAD:#8FBCBB:#ECEFF4"
     background_darkness = 0.97
     background_type = transparent
-    font = Hack 14
+    font = Hack Nerd Font 14
     use_system_font = False
 [layouts]
   [[default]]
