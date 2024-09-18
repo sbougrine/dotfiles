@@ -1,4 +1,5 @@
 return {
+    'mfussenegger/nvim-jdtls',
     'neovim/nvim-lspconfig',
     dependencies = {
         -- LSP Support
@@ -29,7 +30,8 @@ return {
             ensure_installed = {
                 "lua_ls",
                 "pylsp",
-                "bashls"
+                "bashls",
+                "jdtls"
             },
             handlers = {
                 function(server_name) -- default handler (optional)
