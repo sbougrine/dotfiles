@@ -1,5 +1,13 @@
 return {
     {
+        "j-hui/fidget.nvim",
+        opts = {
+            display = {
+                render_limit = 8
+            }
+        },
+    },
+    {
         "folke/which-key.nvim",
         event = "VeryLazy",
         opts = {},
