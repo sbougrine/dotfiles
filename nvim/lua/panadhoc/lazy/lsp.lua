@@ -20,15 +20,9 @@ return {
         config = function()
             -- ensure the java debug adapter is installed
             require("mason-nvim-dap").setup({
-                ensure_installed = { "java-debug-adapter", "java-test" }
+                ensure_installed = { "javadbg", "javatest" }
             })
         end
-    },
-    {
-        "mfussenegger/nvim-jdtls",
-        dependencies = {
-            "mfussenegger/nvim-dap",
-        }
     },
     {
         'neovim/nvim-lspconfig',
@@ -96,36 +90,148 @@ return {
         end
     },
     {
-    "mfussenegger/nvim-dap",
-    dependencies = {
-        -- ui plugins to make debugging simplier
-        "rcarriga/nvim-dap-ui",
-        "nvim-neotest/nvim-nio"
-    },
-    config = function()
-        -- gain access to the dap plugin and its functions
-        local dap = require("dap")
-        -- gain access to the dap ui plugin and its functions
-        local dapui = require("dapui")
+        "mfussenegger/nvim-dap",
+        dependencies = {
+            'theHamsta/nvim-dap-virtual-text',
+            'rcarriga/nvim-dap-ui',
+            'nvim-neotest/nvim-nio',
+            'jbyuki/one-small-step-for-vimkind',
+            'nvim-telescope/telescope.nvim',
+            'nvim-telescope/telescope-dap.nvim',
+            'mfussenegger/nvim-dap-python',
+        },
+        config = function()
+            local keymap = vim.keymap.set
 
-        -- Setup the dap ui with default configuration
-        dapui.setup()
 
-         -- setup an event listener for when the debugger is launched
-        dap.listeners.before.launch.dapui_config = function()
-            -- when the debugger is launched open up the debug ui
-            dapui.open()
+            require('nvim-dap-virtual-text').setup({
+                -- Use eol instead of inline
+                virt_text_pos = "eol",
+            })
+
+            keymap(
+                { 'n', 'v' },
+                '<F3>',
+                "<cmd>lua require('dapui').toggle()<CR>",
+                { silent = true, desc = 'DAP toggle UI' }
+            )
+            keymap(
+                { 'n', 'v' },
+                '<F4>',
+                "<cmd>lua require('dap').pause()<CR>",
+                { silent = true, desc = 'DAP pause (thread)' }
+            )
+            keymap(
+                { 'n', 'v' },
+                '<F5>',
+                "<cmd>lua require('dap').continue()<CR>",
+                { silent = true, desc = 'DAP launch or continue' }
+            )
+            keymap(
+                { 'n', 'v' },
+                '<F6>',
+                "<cmd>lua require('dap').step_into()<CR>",
+                { silent = true, desc = 'DAP step into' }
+            )
+            keymap(
+                { 'n', 'v' },
+                '<F7>',
+                "<cmd>lua require('dap').step_over()<CR>",
+                { silent = true, desc = 'DAP step over' }
+            )
+            keymap(
+                { 'n', 'v' },
+                '<F8>',
+                "<cmd>lua require('dap').step_out()<CR>",
+                { silent = true, desc = 'DAP step out' }
+            )
+            keymap(
+                { 'n', 'v' },
+                '<F9>',
+                "<cmd>lua require('dap').step_back()<CR>",
+                { silent = true, desc = 'DAP step back' }
+            )
+            keymap(
+                { 'n', 'v' },
+                '<leader>bp',
+                "<cmd>lua require('dap').toggle_breakpoint()<CR>",
+                { silent = true, desc = 'DAP toggle breakpoint' }
+            )
+            keymap(
+                { 'n', 'v' },
+                '<leader>dB',
+                "<cmd>lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>",
+                { silent = true, desc = 'DAP set breakpoint with condition' }
+            )
+            keymap(
+                { 'n', 'v' },
+                '<leader>dp',
+                "<cmd>lua require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>",
+                { silent = true, desc = 'DAP set breakpoint with log point message' }
+            )
+
+            local telescope_dap = require('telescope').extensions.dap
+
+            keymap({ 'n', 'v' }, '<leader>d?', function()
+                telescope_dap.commands({})
+            end, { silent = true, desc = 'DAP builtin commands' })
+            keymap({ 'n', 'v' }, '<leader>dl', function()
+                telescope_dap.list_breakpoints({})
+            end, { silent = true, desc = 'DAP breakpoint list' })
+            keymap({ 'n', 'v' }, '<leader>df', function()
+                telescope_dap.frames()
+            end, { silent = true, desc = 'DAP frames' })
+            keymap({ 'n', 'v' }, '<leader>dv', function()
+                telescope_dap.variables()
+            end, { silent = true, desc = 'DAP variables' })
+            keymap({ 'n', 'v' }, '<leader>dc', function()
+                telescope_dap.configurations()
+            end, { silent = true, desc = 'DAP debugger configurations' })
+            local dapui = require("dapui")
+            dapui.setup({
+                layouts = {
+                    -- Changing the layout order will give more space to the first element
+                    {
+                        -- You can change the order of elements in the sidebar
+                        elements = {
+                            -- { id = "scopes", size = 0.25, },
+                            { id = 'stacks', size = 0.50 },
+                            { id = 'breakpoints', size = 0.25 },
+                            { id = 'watches', size = 0.25 },
+                        },
+                        size = 56,
+                        position = 'right', -- Can be "left" or "right"
+                    },
+                    {
+                        elements = {
+                            { id = 'repl', size = 0.60 },
+                            { id = 'console', size = 0.40 },
+                        },
+                        size = 8,
+                        position = 'bottom', -- Can be "bottom" or "top"
+                    },
+                },
+                controls = {
+                    icons = {
+                        pause = '',
+                        play = ' (F5)',
+                        step_into = ' (F6)',
+                        step_over = ' (F7)',
+                        step_out = ' (F8)',
+                        step_back = ' (F9)',
+                        run_last = ' (F10)',
+                        terminate = ' (F12)',
+                        disconnect = ' ([l]d)',
+                    },
+                },
+            })
+
+            local dap = require('dap')
+
+            dap.listeners.after.event_initialized['dapui_config'] = function()
+                dapui.open()
+            end
         end
-
-        -- set a vim motion for <Space> + d + t to toggle a breakpoint at the line where the cursor is currently on
-        vim.keymap.set("n", "<leader>bp", dap.toggle_breakpoint, { desc = "[D]ebug [T]oggle Breakpoint" })
-
-        -- set a vim motion for <Space> + d + s to start the debugger and launch the debugging ui
-        vim.keymap.set("n", "<leader>ds", dap.continue, { desc = "[D]ebug [S]tart" })
-
-        -- set a vim motion to close the debugging ui
-        vim.keymap.set("n", "<leader>dc", dapui.close, {desc = "[D]ebug [C]lose"})
-    end
     },
     {
     "nvimtools/none-ls.nvim",
@@ -146,7 +252,7 @@ return {
         })
 
         -- set up a vim motion for <Space> + c + f to automatically format our code based on which langauge server is active
-        vim.keymap.set("n", "<leader>cf", vim.lsp.buf.format, { desc = "[C]ode [F]ormat" })
+        vim.keymap.set({"n", "v"}, "<leader>cf", vim.lsp.buf.format, { desc = "[C]ode [F]ormat" })
     end
 }
 }
