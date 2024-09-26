@@ -1,5 +1,7 @@
 # dotfiles
 contains environment configs 
 ## Installation
-cd dotfiles\
+```console
+cd dotfiles
 ./install.sh
+```
