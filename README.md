@@ -1,5 +1,5 @@
 # dotfiles
 contains environment configs 
 ## Installation
-cd dotfiles
+cd dotfiles\
 ./install.sh
