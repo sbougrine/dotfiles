@@ -10,4 +10,4 @@
 
 ln -s nvim ~/.config/nvim
 ln -s terminator ~/.config/terminator
-ln -s tmux/.tmux.config ~/.tmux.config
+ln -s tmux/.tmux.conf ~/.tmux.conf
