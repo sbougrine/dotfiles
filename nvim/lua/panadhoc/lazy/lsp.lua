@@ -53,7 +53,7 @@ return {
                         })
                     end,
                     ["bashls"] = function ()
-                        lspconfig.lua_ls.setup()
+                        lspconfig.bashls.setup()
                     end,
                     ["lua_ls"] = function ()
                         lspconfig.lua_ls.setup({
