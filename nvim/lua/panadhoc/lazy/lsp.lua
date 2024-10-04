@@ -7,15 +7,6 @@ return {
         end
     },
     {
-        "williamboman/mason-lspconfig.nvim",
-        config = function()
-            -- ensure that we have lua language server, typescript launguage server, java language server, and java test language server are installed
-            require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "pylsp", "bashls", "jdtls" },
-            })
-        end
-    },
-    {
         "jay-babu/mason-nvim-dap.nvim",
         config = function()
             -- ensure the java debug adapter is installed
@@ -25,51 +16,57 @@ return {
         end
     },
     {
-        'neovim/nvim-lspconfig',
-        config = function()
+        "williamboman/mason-lspconfig.nvim",
+        dependencies = {
+            'neovim/nvim-lspconfig',
+        },
+        config = function ()
             local cmp_lsp = require("cmp_nvim_lsp")
             local capabilities = cmp_lsp.default_capabilities()
 
             require("fidget").setup({})
             local lspconfig = require("lspconfig")
-
-            lspconfig.lua_ls.setup({
-                capabilities = capabilities,
-                settings = {
-                    Lua = {
-                        diagnostics = {
-                            globals = { "vim", "it", "describe", "before_each", "after_each" },
-                        }
-                    }
-                }
-            })
-
-            lspconfig.pylsp.setup({
-                capabilities = capabilities,
-                settings = {
-                    pylsp = {
-                        plugins = {
-                            -- formatter options
-                            black = {
-                                enabled = true,
-                                line_length = 79
+            require('mason-lspconfig').setup({
+                ensure_installed = {'pylsp', 'bashls', 'jdtls', 'lua_ls'},
+                handlers = {
+                    ["pylsp"] = function ()
+                        lspconfig.pylsp.setup({
+                            capabilities = capabilities,
+                            settings = {
+                                pylsp = {
+                                    configurationSources = "flake8",
+                                    plugins = {
+                                        pycodestyle = {enabled = false},
+                                        pyflakes = {enabled = false},
+                                        mccabe = {enabled = false},
+                                        auropep8 = {enabled = false},
+                                        yapf = {enabled = false},
+                                        black = {enabled = true},
+                                        isort = {enabled = true},
+                                        flake8 = {
+                                            enabled = true,
+                                            config = '~/.config/.flake8',
+                                        }
+                                    },
+                                }
                             },
-                            autopep8 = { enabled = false },
-                            yapf = { enabled = false },
-
-                            -- linter options
-                            -- pylint = { enabled = false, executable = "pylint" },
-                            -- pyflakes = { enabled = true },
-                            -- pycodestyle = { enabled = false },
-
-                            -- type checker
-                            pylsp_mypy = { enabled = true },
-                            -- auto-completion options
-                            jedi_completion = { fuzzy = true },
-                            -- import sorting
-                            pyls_isort = { enabled = true },
-                        },
-                    }
+                        })
+                    end,
+                    ["bashls"] = function ()
+                        lspconfig.lua_ls.setup()
+                    end,
+                    ["lua_ls"] = function ()
+                        lspconfig.lua_ls.setup({
+                            capabilities = capabilities,
+                            settings = {
+                                Lua = {
+                                    diagnostics = {
+                                        globals = { "vim", "it", "describe", "before_each", "after_each" },
+                                    }
+                                }
+                            }
+                        })
+                    end
                 }
             })
 
@@ -87,6 +84,8 @@ return {
             vim.keymap.set("n", "<leader>cR", vim.lsp.buf.rename, { desc = "[C]ode [R]ename" })
             -- Set a vim motion for <Space> + c + <Shift>D to go to where the code/object was declared in the project (class file)
             vim.keymap.set("n", "<leader>cD", vim.lsp.buf.declaration, { desc = "[C]ode Goto [D]eclaration" })
+            -- set up a vim motion for <Space> + c + f to automatically format our code based on which langauge server is active
+            vim.keymap.set({"n", "v"}, "<leader>cf", vim.lsp.buf.format, { desc = "[C]ode [F]ormat" })
         end
     },
     {
@@ -247,12 +246,9 @@ return {
                 -- setup lua formatter
                 null_ls.builtins.formatting.stylua,
                 -- setup prettier to format languages that are not lua
-                null_ls.builtins.formatting.prettier
+                null_ls.builtins.formatting.prettier,
             }
         })
-
-        -- set up a vim motion for <Space> + c + f to automatically format our code based on which langauge server is active
-        vim.keymap.set({"n", "v"}, "<leader>cf", vim.lsp.buf.format, { desc = "[C]ode [F]ormat" })
-    end
-}
+        end
+    }
 }
