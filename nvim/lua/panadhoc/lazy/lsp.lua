@@ -3,7 +3,7 @@ return {
         "williamboman/mason.nvim",
         config = function()
             -- setup mason with default properties
-            require("mason").setup()
+            require("mason").setup({})
         end
     },
     {
